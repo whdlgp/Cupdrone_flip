@@ -1,3 +1,7 @@
+Flip Mode of CupDrone(SkyRover Nano)
+====================================
+ChoYG : whdlgp@gmail.com
+
 SkyRover_Nano
 =============
 
