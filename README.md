@@ -2,6 +2,8 @@ Flip Mode of CupDrone(SkyRover Nano)
 ====================================
 ChoYG : whdlgp@gmail.com
 
+See wiki : https://github.com/whdlgp/Cupdrone_flip_test/wiki
+
 SkyRover_Nano
 =============
 
