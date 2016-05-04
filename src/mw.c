@@ -68,6 +68,10 @@ uint16_t AccInflightCalibrationActive = 0;
 uint8_t batteryCellCount = 3;       // cell count
 uint16_t batteryWarningVoltage;     // annoying buzzer after this one, battery ready to be dead
 
+//플립 동작중 로깅을 위한 배열/함수, 다른 함수 내부에서 지역변수 등을 로깅하고 싶을 때 이용
+int16_t logReg[3];
+void logRegister(uint8_t index, int16_t data);
+
 void blinkLED(uint8_t num, uint8_t wait, uint8_t repeat)
 {
     uint8_t i, r;
@@ -767,11 +771,52 @@ void logFlagControl()
 	logFlag = 1;
 }
 
+void logFlagReset()
+{
+	logFlag = 0;
+}
+
+uint8_t logFlagRead()
+{
+	return logFlag;
+}
+
 typedef struct logData
 {
 	uint8_t step;
-	int16_t data;
+	int16_t data[3];
 } logData;
+
+typedef struct logStruct
+{
+	logData buf[300];
+
+	uint8_t start;
+	uint16_t count;
+} logStruct;
+
+void logRegister(uint8_t index, int16_t data)
+{
+	logReg[index] = data;
+}
+
+void logScheduler(logStruct* LOG, uint8_t step)
+{
+	static uint8_t preStep = pidControl;
+
+	if(preStep != step)
+	{
+		if(preStep == pidControl) //Start Logging in dump
+		{
+			//set start flag, reset count of logged data
+			LOG->count = 0;
+			LOG->start = 1;
+		}
+		else if(step == pidControl) //Stop Logging in dump
+			LOG->start = 0;
+	}
+	preStep = step;
+}
 
 int16_t angle2(uint8_t step, int16_t angle)
 {
@@ -801,76 +846,85 @@ int16_t angle2(uint8_t step, int16_t angle)
 	return returnval;
 }
 
-void logging(uint8_t step)
+void bufWrite(logStruct* LOG, uint8_t step, int16_t data0, int16_t data1, int16_t data2)
 {
-	//for logging
-	static uint16_t lineNum = 0;
-	static uint16_t lineMax = 0;
-	static logData log[600];
+	static uint8_t timeTic = 0; // 1tic means 3.5ms
 
-	static uint8_t startLogging = 0;
-	static uint8_t preStep = pidControl;
+	timeTic++;
 
-	//for logging
-	if(preStep != step)
+	if(timeTic > 1) //7ms period, loop time: 3.5ms
 	{
-		if(preStep == pidControl) //Start Logging in dump
-			startLogging = 1;
-		else if(step == pidControl) //Stop Logging in dump
-			startLogging = 0;
+		timeTic = 0;
+
+		LOG->buf[LOG->count].step = step;
+		LOG->buf[LOG->count].data[0] = data0;
+		LOG->buf[LOG->count].data[1] = data1;
+		LOG->buf[LOG->count].data[2] = data2;
+
+		LOG->count++;
 	}
-	preStep = step;
+}
 
-	if(startLogging)
+void dataSend(logStruct* LOG)
+{
+	static uint16_t sendCount = 0;
+
+	static uint8_t timeTic = 0;
+	uint8_t sendData[7];
+
+	timeTic++;
+	if(timeTic > 13)
 	{
-		static uint8_t timeTic = 0; // 1tic means 3.5ms
-		timeTic++;
-		if(timeTic > 1)
+		timeTic = 0;
+
+		sendData[0] = LOG->buf[sendCount].step;
+
+		sendData[1] = LOG->buf[sendCount].data[0] >> 8;
+		sendData[2] = LOG->buf[sendCount].data[0] & 0xff;
+
+		sendData[3] = LOG->buf[sendCount].data[1] >> 8;
+		sendData[4] = LOG->buf[sendCount].data[1] & 0xff;
+
+		sendData[5] = LOG->buf[sendCount].data[2] >> 8;
+		sendData[6] = LOG->buf[sendCount].data[2] & 0xff;
+
+		serialWrite(core.mainport, '$');
+		serialWrite(core.mainport, 'M');
+		serialWrite(core.mainport, sendData[0]);
+		serialWrite(core.mainport, sendData[1]);
+		serialWrite(core.mainport, sendData[2]);
+		serialWrite(core.mainport, sendData[3]);
+		serialWrite(core.mainport, sendData[4]);
+		serialWrite(core.mainport, sendData[5]);
+		serialWrite(core.mainport, sendData[6]);
+		sendCount++;
+
+		if(sendCount == LOG->count)
 		{
-			timeTic = 0;
-
-			log[lineNum].step = step;
-			log[lineNum].data = angle2(step,angle[ROLL]);
-			//log[lineNum].data = angle[ROLL];
-			//log[lineNum].data = gyroData[ROLL] >> 2;
-			lineNum++;
-
-			lineMax = lineNum;
+			sendCount = 0;
+			logFlagReset();
 		}
 	}
-	else
-		lineNum = 0;
+}
 
+void logging(step)
+{
+	static logStruct LOG;
 
-	//if(serialTotalBytesWaiting(core.debugport) > 0)
-	if(logFlag)
+	logScheduler(&LOG, step);
+
+	if(LOG.start)
 	{
-		static uint8_t timeTic = 0;
-		static uint16_t lineCount = 0;
-		uint8_t sendData[3];
+		//logRegister(0, angle2(step, angle[ROLL]));
+		logRegister(2, axisPID[ROLL]);
+		//logRegister(2, rcCommand[THROTTLE]);
 
-		timeTic++;
-		if(timeTic > 13)
-		{
-			timeTic = 0;
+		bufWrite(&LOG, step, logReg[0], logReg[1], logReg[2]/*gyroData[ROLL] >> 2*/);
+	}
 
-			sendData[0] = log[lineCount].step;
-			sendData[1] = log[lineCount].data >> 8;
-			sendData[2] = log[lineCount].data & 0xff;
-
-			serialWrite(core.mainport, '$');
-			serialWrite(core.mainport, 'M');
-			serialWrite(core.mainport, sendData[0]);
-			serialWrite(core.mainport, sendData[1]);
-			serialWrite(core.mainport, sendData[2]);
-			lineCount++;
-
-			if(lineCount == lineMax)
-			{
-				lineCount = 0;
-				logFlag = 0;
-			}
-		}
+	if(logFlagRead())
+	{
+		dataSend(&LOG);
 	}
 }
 /**************************************************/

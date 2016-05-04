@@ -203,6 +203,7 @@ USART_InitStructure
                     0x10              obj/SKYROVER/hw_config.o
 Hw_VCom_Q_End       0x2               obj/SKYROVER/drv_vcom_q.o
 GPS_svinfo_quality  0x10              obj/SKYROVER/mw.o
+logReg              0x6               obj/SKYROVER/mw.o
 dynI8               0x3               obj/SKYROVER/mw.o
 rssi                0x2               obj/SKYROVER/mw.o
 GPS_numSat          0x1               obj/SKYROVER/mw.o
@@ -360,26 +361,32 @@ Discarded input sections
                 0x00000000        0xa obj/SKYROVER/mw.o
  .text.anglePassed
                 0x00000000       0x16 obj/SKYROVER/mw.o
+ .text.logFlagReset
+                0x00000000        0xc obj/SKYROVER/mw.o
+ .text.logFlagRead
+                0x00000000        0xc obj/SKYROVER/mw.o
+ .text.logRegister
+                0x00000000        0xc obj/SKYROVER/mw.o
+ .text.logScheduler
+                0x00000000       0x28 obj/SKYROVER/mw.o
  .text.angle2   0x00000000       0x24 obj/SKYROVER/mw.o
- .text.logging  0x00000000      0x104 obj/SKYROVER/mw.o
- .bss.lineCount.9893
-                0x00000000        0x2 obj/SKYROVER/mw.o
- .rodata.str1.1
-                0x00000000       0x8b obj/SKYROVER/mw.o
- .bss.log.9888  0x00000000      0x960 obj/SKYROVER/mw.o
- .bss.timeTic.9891
+ .text.bufWrite
+                0x00000000       0x3c obj/SKYROVER/mw.o
+ .text.dataSend
+                0x00000000       0xb4 obj/SKYROVER/mw.o
+ .text.logging  0x00000000       0x58 obj/SKYROVER/mw.o
+ .bss.timeTic.9917
                 0x00000000        0x1 obj/SKYROVER/mw.o
+ .bss.LOG.9922  0x00000000      0x964 obj/SKYROVER/mw.o
+ .bss.sendCount.9916
+                0x00000000        0x2 obj/SKYROVER/mw.o
  .bss.debugCounter
                 0x00000000        0x1 obj/SKYROVER/mw.o
- .bss.startLogging.9889
+ .data.preStep.9893
                 0x00000000        0x1 obj/SKYROVER/mw.o
- .bss.timeTic.9892
-                0x00000000        0x1 obj/SKYROVER/mw.o
- .bss.lineMax.9887
-                0x00000000        0x2 obj/SKYROVER/mw.o
- .bss.lineNum.9886
-                0x00000000        0x2 obj/SKYROVER/mw.o
- .data.preStep.9890
+ .rodata.str1.1
+                0x00000000       0x8b obj/SKYROVER/mw.o
+ .bss.timeTic.9912
                 0x00000000        0x1 obj/SKYROVER/mw.o
  .text          0x00000000        0x0 obj/SKYROVER/sensors.o
  .data          0x00000000        0x0 obj/SKYROVER/sensors.o
@@ -7391,20 +7398,21 @@ LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q3/bin/../lib/gcc/arm
                 0x20000020        0xc obj/SKYROVER/imu.o
  .data.servo    0x2000002c       0x10 obj/SKYROVER/mixer.o
                 0x2000002c                servo
- .data.step.9856
+ .data.GPSNavReset.9945
                 0x2000003c        0x1 obj/SKYROVER/mw.o
- *fill*         0x2000003d        0x3 
+ .data.step.9860
+                0x2000003d        0x1 obj/SKYROVER/mw.o
+ *fill*         0x2000003e        0x2 
  .data.pid_controller
                 0x20000040        0x4 obj/SKYROVER/mw.o
                 0x20000040                pid_controller
  .data.flipState
                 0x20000044       0x50 obj/SKYROVER/mw.o
                 0x20000044                flipState
- .data.GPSNavReset.9917
-                0x20000094        0x1 obj/SKYROVER/mw.o
  .data.batteryCellCount
-                0x20000095        0x1 obj/SKYROVER/mw.o
-                0x20000095                batteryCellCount
+                0x20000094        0x1 obj/SKYROVER/mw.o
+                0x20000094                batteryCellCount
+ *fill*         0x20000095        0x1 
  .data.acc_1G   0x20000096        0x2 obj/SKYROVER/sensors.o
                 0x20000096                acc_1G
  .data.boxes    0x20000098      0x108 obj/SKYROVER/serial.o
@@ -7488,7 +7496,7 @@ LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q3/bin/../lib/gcc/arm
  .igot.plt      0x00000000        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
                 0x200006fc                . = ALIGN (0x4)
 
-.bss            0x200006fc     0x37f0 load address 0x0801b8c4
+.bss            0x200006fc     0x3800 load address 0x0801b8c4
                 0x200006fc                _sbss = .
                 0x200006fc                __bss_start__ = _sbss
  *(.bss)
@@ -7736,504 +7744,512 @@ LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q3/bin/../lib/gcc/arm
                 0x20000be2        0x2 obj/SKYROVER/mixer.o
  .bss.currentMixer
                 0x20000be4       0xc0 obj/SKYROVER/mixer.o
- .bss.flipStep.9898
-                0x20000ca4        0x1 obj/SKYROVER/mw.o
- .bss.rcDelayCommand.9909
-                0x20000ca5        0x1 obj/SKYROVER/mw.o
- *fill*         0x20000ca6        0x2 
- .bss.rcTime.9913
-                0x20000ca8        0x4 obj/SKYROVER/mw.o
- .bss.nav_mode  0x20000cac        0x1 obj/SKYROVER/mw.o
-                0x20000cac                nav_mode
- .bss.logFlag   0x20000cad        0x1 obj/SKYROVER/mw.o
-                0x20000cad                logFlag
- *fill*         0x20000cae        0x2 
+ .bss.nav_mode  0x20000ca4        0x1 obj/SKYROVER/mw.o
+                0x20000ca4                nav_mode
+ *fill*         0x20000ca5        0x1 
+ .bss.vbatRawArray.9710
+                0x20000ca6       0x10 obj/SKYROVER/mw.o
+ .bss.isAltHoldChanged.9975
+                0x20000cb6        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000cb7        0x1 
  .bss.errorAngleI
-                0x20000cb0        0x8 obj/SKYROVER/mw.o
- .bss.isAltHoldChanged.9947
-                0x20000cb8        0x1 obj/SKYROVER/mw.o
- *fill*         0x20000cb9        0x3 
- .bss.delta2.9767
-                0x20000cbc        0xc obj/SKYROVER/mw.o
- .bss.delta2.9781
+                0x20000cb8        0x8 obj/SKYROVER/mw.o
+ .bss.rcReadRawFunc
+                0x20000cc0        0x4 obj/SKYROVER/mw.o
+                0x20000cc0                rcReadRawFunc
+ .bss.rc4ValuesIndex.9736
+                0x20000cc4        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000cc5        0x3 
+ .bss.delta2.9785
                 0x20000cc8        0xc obj/SKYROVER/mw.o
- .bss.rcData4Values.9730
-                0x20000cd4       0x40 obj/SKYROVER/mw.o
- .bss.timeTic.9847
-                0x20000d14        0x1 obj/SKYROVER/mw.o
- *fill*         0x20000d15        0x3 
- .bss.lastError.9785
-                0x20000d18        0xc obj/SKYROVER/mw.o
- .bss.failsafeEvents
-                0x20000d24        0x2 obj/SKYROVER/mw.o
-                0x20000d24                failsafeEvents
- *fill*         0x20000d26        0x2 
- .bss.currentTime
-                0x20000d28        0x4 obj/SKYROVER/mw.o
-                0x20000d28                currentTime
- .bss.loopTime.9915
+ .bss.ind.9708  0x20000cd4        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000cd5        0x3 
+ .bss.taskOrder.9967
+                0x20000cd8        0x4 obj/SKYROVER/mw.o
+ .bss.logFlag   0x20000cdc        0x1 obj/SKYROVER/mw.o
+                0x20000cdc                logFlag
+ *fill*         0x20000cdd        0x3 
+ .bss.delta1.9770
+                0x20000ce0        0xc obj/SKYROVER/mw.o
+ .bss.rcData4Values.9734
+                0x20000cec       0x40 obj/SKYROVER/mw.o
+ .bss.rcTime.9941
                 0x20000d2c        0x4 obj/SKYROVER/mw.o
- .bss.rcDataMean.9731
-                0x20000d30       0x10 obj/SKYROVER/mw.o
+ .bss.GPSLEDTime.9722
+                0x20000d30        0x4 obj/SKYROVER/mw.o
+ .bss.lastError.9789
+                0x20000d34        0xc obj/SKYROVER/mw.o
  .bss.toggleBeep
                 0x20000d40        0x1 obj/SKYROVER/mw.o
                 0x20000d40                toggleBeep
+ *fill*         0x20000d41        0x1 
+ .bss.rcDataMean.9735
+                0x20000d42       0x10 obj/SKYROVER/mw.o
  .bss.flipStateFlag
-                0x20000d41        0x1 obj/SKYROVER/mw.o
-                0x20000d41                flipStateFlag
+                0x20000d52        0x1 obj/SKYROVER/mw.o
+                0x20000d52                flipStateFlag
+ *fill*         0x20000d53        0x1 
  .bss.GPS_angle
-                0x20000d42        0x4 obj/SKYROVER/mw.o
-                0x20000d42                GPS_angle
- .bss.rcSticks.9910
-                0x20000d46        0x1 obj/SKYROVER/mw.o
- *fill*         0x20000d47        0x1 
- .bss.calibratedAccTime.9696
-                0x20000d48        0x4 obj/SKYROVER/mw.o
- .bss.GPSLEDTime.9718
-                0x20000d4c        0x4 obj/SKYROVER/mw.o
+                0x20000d54        0x4 obj/SKYROVER/mw.o
+                0x20000d54                GPS_angle
+ .bss.failsafeEvents
+                0x20000d58        0x2 obj/SKYROVER/mw.o
+                0x20000d58                failsafeEvents
+ .bss.currentAngle.9861
+                0x20000d5a        0x2 obj/SKYROVER/mw.o
  .bss.AccInflightCalibrationActive
-                0x20000d50        0x2 obj/SKYROVER/mw.o
-                0x20000d50                AccInflightCalibrationActive
- .bss.currentAngle.9857
-                0x20000d52        0x2 obj/SKYROVER/mw.o
- .bss.ind.9704  0x20000d54        0x1 obj/SKYROVER/mw.o
- *fill*         0x20000d55        0x1 
- .bss.vbatRawArray.9706
-                0x20000d56       0x10 obj/SKYROVER/mw.o
- .bss.initialThrottleHold.9914
-                0x20000d66        0x2 obj/SKYROVER/mw.o
- .bss.InflightcalibratingA
-                0x20000d68        0x2 obj/SKYROVER/mw.o
-                0x20000d68                InflightcalibratingA
- .bss.AltHoldCorr.9948
-                0x20000d6a        0x2 obj/SKYROVER/mw.o
- .bss.GPS_ground_course
-                0x20000d6c        0x2 obj/SKYROVER/mw.o
-                0x20000d6c                GPS_ground_course
- .bss.cycleTime
-                0x20000d6e        0x2 obj/SKYROVER/mw.o
-                0x20000d6e                cycleTime
+                0x20000d5c        0x2 obj/SKYROVER/mw.o
+                0x20000d5c                AccInflightCalibrationActive
+ .bss.rcDelayCommand.9937
+                0x20000d5e        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000d5f        0x1 
  .bss.previousTime
-                0x20000d70        0x4 obj/SKYROVER/mw.o
-                0x20000d70                previousTime
- .bss.buzzerFreq.9702
+                0x20000d60        0x4 obj/SKYROVER/mw.o
+                0x20000d60                previousTime
+ .bss.rcSticks.9938
+                0x20000d64        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000d65        0x1 
+ .bss.InflightcalibratingA
+                0x20000d66        0x2 obj/SKYROVER/mw.o
+                0x20000d66                InflightcalibratingA
+ .bss.delta2.9771
+                0x20000d68        0xc obj/SKYROVER/mw.o
+ .bss.flipStep.9926
                 0x20000d74        0x1 obj/SKYROVER/mw.o
- .bss.vbatTimer.9703
-                0x20000d75        0x1 obj/SKYROVER/mw.o
- .bss.lastGyro.9765
-                0x20000d76        0x6 obj/SKYROVER/mw.o
- .bss.delta1.9766
-                0x20000d7c        0xc obj/SKYROVER/mw.o
- .bss.delta1.9780
-                0x20000d88        0xc obj/SKYROVER/mw.o
- .bss.AccInflightCalibrationSavetoEEProm
-                0x20000d94        0x2 obj/SKYROVER/mw.o
-                0x20000d94                AccInflightCalibrationSavetoEEProm
- .bss.rc4ValuesIndex.9732
-                0x20000d96        0x1 obj/SKYROVER/mw.o
- *fill*         0x20000d97        0x1 
- .bss.taskOrder.9939
-                0x20000d98        0x4 obj/SKYROVER/mw.o
- .bss.rcReadRawFunc
-                0x20000d9c        0x4 obj/SKYROVER/mw.o
-                0x20000d9c                rcReadRawFunc
- .bss.GPS_update
-                0x20000da0        0x1 obj/SKYROVER/mw.o
-                0x20000da0                GPS_update
- *fill*         0x20000da1        0x1 
+ *fill*         0x20000d75        0x1 
+ .bss.cycleTime
+                0x20000d76        0x2 obj/SKYROVER/mw.o
+                0x20000d76                cycleTime
+ .bss.buzzerFreq.9706
+                0x20000d78        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000d79        0x3 
+ .bss.currentTime
+                0x20000d7c        0x4 obj/SKYROVER/mw.o
+                0x20000d7c                currentTime
+ .bss.timeTic.9851
+                0x20000d80        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000d81        0x1 
+ .bss.AltHoldCorr.9976
+                0x20000d82        0x2 obj/SKYROVER/mw.o
  .bss.AccInflightCalibrationMeasurementDone
+                0x20000d84        0x2 obj/SKYROVER/mw.o
+                0x20000d84                AccInflightCalibrationMeasurementDone
+ .bss.vbatTimer.9707
+                0x20000d86        0x1 obj/SKYROVER/mw.o
+ *fill*         0x20000d87        0x1 
+ .bss.calibratedAccTime.9700
+                0x20000d88        0x4 obj/SKYROVER/mw.o
+ .bss.lastGyro.9769
+                0x20000d8c        0x6 obj/SKYROVER/mw.o
+ *fill*         0x20000d92        0x2 
+ .bss.delta1.9784
+                0x20000d94        0xc obj/SKYROVER/mw.o
+ .bss.AccInflightCalibrationSavetoEEProm
+                0x20000da0        0x2 obj/SKYROVER/mw.o
+                0x20000da0                AccInflightCalibrationSavetoEEProm
+ .bss.GPS_ground_course
                 0x20000da2        0x2 obj/SKYROVER/mw.o
-                0x20000da2                AccInflightCalibrationMeasurementDone
- .bss.failsafeCnt
+                0x20000da2                GPS_ground_course
+ .bss.initialThrottleHold.9942
                 0x20000da4        0x2 obj/SKYROVER/mw.o
-                0x20000da4                failsafeCnt
- *fill*         0x20000da6        0x2 
+ .bss.GPS_update
+                0x20000da6        0x1 obj/SKYROVER/mw.o
+                0x20000da6                GPS_update
+ *fill*         0x20000da7        0x1 
+ .bss.loopTime.9943
+                0x20000da8        0x4 obj/SKYROVER/mw.o
+ .bss.failsafeCnt
+                0x20000dac        0x2 obj/SKYROVER/mw.o
+                0x20000dac                failsafeCnt
+ *fill*         0x20000dae        0x2 
  .bss.errorGyroI
-                0x20000da8        0xc obj/SKYROVER/mw.o
+                0x20000db0        0xc obj/SKYROVER/mw.o
  .bss.magZeroTempMax.9735
-                0x20000db4        0x6 obj/SKYROVER/sensors.o
- *fill*         0x20000dba        0x2 
- .bss.t.9732    0x20000dbc        0x4 obj/SKYROVER/sensors.o
+                0x20000dbc        0x6 obj/SKYROVER/sensors.o
+ *fill*         0x20000dc2        0x2 
+ .bss.t.9732    0x20000dc4        0x4 obj/SKYROVER/sensors.o
  .bss.tCal.9733
-                0x20000dc0        0x4 obj/SKYROVER/sensors.o
+                0x20000dc8        0x4 obj/SKYROVER/sensors.o
  .bss.magZeroTempMin.9734
-                0x20000dc4        0x6 obj/SKYROVER/sensors.o
- *fill*         0x20000dca        0x2 
+                0x20000dcc        0x6 obj/SKYROVER/sensors.o
+ *fill*         0x20000dd2        0x2 
  .bss.baroHistIdx.9681
-                0x20000dcc        0x4 obj/SKYROVER/sensors.o
+                0x20000dd4        0x4 obj/SKYROVER/sensors.o
  .bss.calibratingA
-                0x20000dd0        0x2 obj/SKYROVER/sensors.o
-                0x20000dd0                calibratingA
+                0x20000dd8        0x2 obj/SKYROVER/sensors.o
+                0x20000dd8                calibratingA
  .bss.calibratingB
-                0x20000dd2        0x2 obj/SKYROVER/sensors.o
-                0x20000dd2                calibratingB
+                0x20000dda        0x2 obj/SKYROVER/sensors.o
+                0x20000dda                calibratingB
  .bss.baroHistTab.9680
-                0x20000dd4       0xc0 obj/SKYROVER/sensors.o
- .bss.b.9668    0x20000e94        0xc obj/SKYROVER/sensors.o
- .bss.a.9663    0x20000ea0        0xc obj/SKYROVER/sensors.o
+                0x20000ddc       0xc0 obj/SKYROVER/sensors.o
+ .bss.b.9668    0x20000e9c        0xc obj/SKYROVER/sensors.o
+ .bss.a.9663    0x20000ea8        0xc obj/SKYROVER/sensors.o
  .bss.angleTrim_saved.9670
-                0x20000eac        0x4 obj/SKYROVER/sensors.o
+                0x20000eb4        0x4 obj/SKYROVER/sensors.o
  .bss.accHardware
-                0x20000eb0        0x1 obj/SKYROVER/sensors.o
-                0x20000eb0                accHardware
- *fill*         0x20000eb1        0x3 
- .bss.var.9713  0x20000eb4       0x3c obj/SKYROVER/sensors.o
+                0x20000eb8        0x1 obj/SKYROVER/sensors.o
+                0x20000eb8                accHardware
+ *fill*         0x20000eb9        0x3 
+ .bss.var.9713  0x20000ebc       0x3c obj/SKYROVER/sensors.o
  .bss.state.9687
-                0x20000ef0        0x4 obj/SKYROVER/sensors.o
+                0x20000ef8        0x4 obj/SKYROVER/sensors.o
  .bss.calibratingG
-                0x20000ef4        0x2 obj/SKYROVER/sensors.o
-                0x20000ef4                calibratingG
- .bss.magInit   0x20000ef6        0x1 obj/SKYROVER/sensors.o
- *fill*         0x20000ef7        0x1 
+                0x20000efc        0x2 obj/SKYROVER/sensors.o
+                0x20000efc                calibratingG
+ .bss.magInit   0x20000efe        0x1 obj/SKYROVER/sensors.o
+ *fill*         0x20000eff        0x1 
  .bss.accZero_saved.9669
-                0x20000ef8        0x6 obj/SKYROVER/sensors.o
- *fill*         0x20000efe        0x2 
+                0x20000f00        0x6 obj/SKYROVER/sensors.o
+ *fill*         0x20000f06        0x2 
  .bss.baroDeadline.9686
-                0x20000f00        0x4 obj/SKYROVER/sensors.o
- .bss.g.9712    0x20000f04        0xc obj/SKYROVER/sensors.o
+                0x20000f08        0x4 obj/SKYROVER/sensors.o
+ .bss.g.9712    0x20000f0c        0xc obj/SKYROVER/sensors.o
  .bss.dataSize.9847
-                0x20000f10        0x1 obj/SKYROVER/serial.o
- .bss.checksum  0x20000f11        0x1 obj/SKYROVER/serial.o
- .bss.indRX     0x20000f12        0x1 obj/SKYROVER/serial.o
+                0x20000f18        0x1 obj/SKYROVER/serial.o
+ .bss.checksum  0x20000f19        0x1 obj/SKYROVER/serial.o
+ .bss.indRX     0x20000f1a        0x1 obj/SKYROVER/serial.o
  .bss.offset.9846
-                0x20000f13        0x1 obj/SKYROVER/serial.o
+                0x20000f1b        0x1 obj/SKYROVER/serial.o
  .bss.numberBoxItems
-                0x20000f14        0x1 obj/SKYROVER/serial.o
- .bss.t.9630    0x20000f15        0x1 obj/SKYROVER/serial.o
- .bss.t.9634    0x20000f16        0x1 obj/SKYROVER/serial.o
- .bss.cmdMSP    0x20000f17        0x1 obj/SKYROVER/serial.o
+                0x20000f1c        0x1 obj/SKYROVER/serial.o
+ .bss.t.9630    0x20000f1d        0x1 obj/SKYROVER/serial.o
+ .bss.t.9634    0x20000f1e        0x1 obj/SKYROVER/serial.o
+ .bss.cmdMSP    0x20000f1f        0x1 obj/SKYROVER/serial.o
  .bss.availableBoxes
-                0x20000f18       0x15 obj/SKYROVER/serial.o
- .bss.inBuf     0x20000f2d       0x40 obj/SKYROVER/serial.o
+                0x20000f20       0x15 obj/SKYROVER/serial.o
+ .bss.inBuf     0x20000f35       0x40 obj/SKYROVER/serial.o
  .bss.c_state.9855
-                0x20000f6d        0x1 obj/SKYROVER/serial.o
- .bss.cliMode   0x20000f6e        0x1 obj/SKYROVER/serial.o
-                0x20000f6e                cliMode
+                0x20000f75        0x1 obj/SKYROVER/serial.o
+ .bss.cliMode   0x20000f76        0x1 obj/SKYROVER/serial.o
+                0x20000f76                cliMode
  .bss.sbusFrameDone
-                0x20000f6f        0x1 obj/SKYROVER/sbus.o
+                0x20000f77        0x1 obj/SKYROVER/sbus.o
  .bss.sbusChannelData
-                0x20000f70       0x20 obj/SKYROVER/sbus.o
+                0x20000f78       0x20 obj/SKYROVER/sbus.o
  .bss.sbusTimeLast.9650
-                0x20000f90        0x4 obj/SKYROVER/sbus.o
- .bss.sbus      0x20000f94       0x19 obj/SKYROVER/sbus.o
+                0x20000f98        0x4 obj/SKYROVER/sbus.o
+ .bss.sbus      0x20000f9c       0x19 obj/SKYROVER/sbus.o
  .bss.sbusFramePosition.9651
-                0x20000fad        0x1 obj/SKYROVER/sbus.o
+                0x20000fb5        0x1 obj/SKYROVER/sbus.o
  .bss.sumdIndex.9629
-                0x20000fae        0x1 obj/SKYROVER/sumd.o
- .bss.sumd      0x20000faf       0x15 obj/SKYROVER/sumd.o
+                0x20000fb6        0x1 obj/SKYROVER/sumd.o
+ .bss.sumd      0x20000fb7       0x15 obj/SKYROVER/sumd.o
  .bss.sumdFrameDone
-                0x20000fc4        0x1 obj/SKYROVER/sumd.o
- .bss.sumdSize  0x20000fc5        0x1 obj/SKYROVER/sumd.o
- *fill*         0x20000fc6        0x2 
+                0x20000fcc        0x1 obj/SKYROVER/sumd.o
+ .bss.sumdSize  0x20000fcd        0x1 obj/SKYROVER/sumd.o
+ *fill*         0x20000fce        0x2 
  .bss.sumdTimeLast.9628
-                0x20000fc8        0x4 obj/SKYROVER/sumd.o
+                0x20000fd0        0x4 obj/SKYROVER/sumd.o
  .bss.sumdChannelData
-                0x20000fcc       0x20 obj/SKYROVER/sumd.o
+                0x20000fd4       0x20 obj/SKYROVER/sumd.o
  .bss.spek_chan_shift
-                0x20000fec        0x1 obj/SKYROVER/spektrum.o
- .bss.rcFrameComplete
-                0x20000fed        0x1 obj/SKYROVER/spektrum.o
- *fill*         0x20000fee        0x2 
- .bss.spekTimeLast.9634
-                0x20000ff0        0x4 obj/SKYROVER/spektrum.o
- .bss.spekDataIncoming
                 0x20000ff4        0x1 obj/SKYROVER/spektrum.o
- .bss.spekHiRes
+ .bss.rcFrameComplete
                 0x20000ff5        0x1 obj/SKYROVER/spektrum.o
- .bss.spek_chan_mask
-                0x20000ff6        0x1 obj/SKYROVER/spektrum.o
- *fill*         0x20000ff7        0x1 
- .bss.spekTimeInterval.9635
+ *fill*         0x20000ff6        0x2 
+ .bss.spekTimeLast.9634
                 0x20000ff8        0x4 obj/SKYROVER/spektrum.o
- .bss.spekFramePosition.9636
+ .bss.spekDataIncoming
                 0x20000ffc        0x1 obj/SKYROVER/spektrum.o
- *fill*         0x20000ffd        0x3 
+ .bss.spekHiRes
+                0x20000ffd        0x1 obj/SKYROVER/spektrum.o
+ .bss.spek_chan_mask
+                0x20000ffe        0x1 obj/SKYROVER/spektrum.o
+ *fill*         0x20000fff        0x1 
+ .bss.spekTimeInterval.9635
+                0x20001000        0x4 obj/SKYROVER/spektrum.o
+ .bss.spekFramePosition.9636
+                0x20001004        0x1 obj/SKYROVER/spektrum.o
+ *fill*         0x20001005        0x3 
  .bss.spekChannelData.9644
-                0x20001000       0x1c obj/SKYROVER/spektrum.o
- .bss.cycleNum  0x2000101c        0x1 obj/SKYROVER/telemetry.o
- *fill*         0x2000101d        0x1 
+                0x20001008       0x1c obj/SKYROVER/spektrum.o
+ .bss.cycleNum  0x20001024        0x1 obj/SKYROVER/telemetry.o
+ *fill*         0x20001025        0x1 
  .bss.currentCell.9654
-                0x2000101e        0x2 obj/SKYROVER/telemetry.o
+                0x20001026        0x2 obj/SKYROVER/telemetry.o
  .bss.telemetryEnabled
-                0x20001020        0x1 obj/SKYROVER/telemetry.o
- *fill*         0x20001021        0x3 
+                0x20001028        0x1 obj/SKYROVER/telemetry.o
+ *fill*         0x20001029        0x3 
  .bss.lastCycleTime
-                0x20001024        0x4 obj/SKYROVER/telemetry.o
+                0x2000102c        0x4 obj/SKYROVER/telemetry.o
  .bss.i2cErrorCount
-                0x20001028        0x2 obj/SKYROVER/drv_i2c.o
- .bss.writing   0x2000102a        0x1 obj/SKYROVER/drv_i2c.o
+                0x20001030        0x2 obj/SKYROVER/drv_i2c.o
+ .bss.writing   0x20001032        0x1 obj/SKYROVER/drv_i2c.o
  .bss.index.9255
-                0x2000102b        0x1 obj/SKYROVER/drv_i2c.o
- .bss.bytes     0x2000102c        0x1 obj/SKYROVER/drv_i2c.o
+                0x20001033        0x1 obj/SKYROVER/drv_i2c.o
+ .bss.bytes     0x20001034        0x1 obj/SKYROVER/drv_i2c.o
  .bss.subaddress_sent.9253
-                0x2000102d        0x1 obj/SKYROVER/drv_i2c.o
- *fill*         0x2000102e        0x2 
- .bss.read_p    0x20001030        0x4 obj/SKYROVER/drv_i2c.o
- .bss.final_stop.9254
-                0x20001034        0x1 obj/SKYROVER/drv_i2c.o
- .bss.error     0x20001035        0x1 obj/SKYROVER/drv_i2c.o
+                0x20001035        0x1 obj/SKYROVER/drv_i2c.o
  *fill*         0x20001036        0x2 
- .bss.write_p   0x20001038        0x4 obj/SKYROVER/drv_i2c.o
- .bss.reg       0x2000103c        0x1 obj/SKYROVER/drv_i2c.o
- .bss.reading   0x2000103d        0x1 obj/SKYROVER/drv_i2c.o
+ .bss.read_p    0x20001038        0x4 obj/SKYROVER/drv_i2c.o
+ .bss.final_stop.9254
+                0x2000103c        0x1 obj/SKYROVER/drv_i2c.o
+ .bss.error     0x2000103d        0x1 obj/SKYROVER/drv_i2c.o
  *fill*         0x2000103e        0x2 
- .bss.I2Cx      0x20001040        0x4 obj/SKYROVER/drv_i2c.o
- .bss.busy      0x20001044        0x1 obj/SKYROVER/drv_i2c.o
- .bss.addr      0x20001045        0x1 obj/SKYROVER/drv_i2c.o
+ .bss.write_p   0x20001040        0x4 obj/SKYROVER/drv_i2c.o
+ .bss.reg       0x20001044        0x1 obj/SKYROVER/drv_i2c.o
+ .bss.reading   0x20001045        0x1 obj/SKYROVER/drv_i2c.o
  *fill*         0x20001046        0x2 
+ .bss.I2Cx      0x20001048        0x4 obj/SKYROVER/drv_i2c.o
+ .bss.busy      0x2000104c        0x1 obj/SKYROVER/drv_i2c.o
+ .bss.addr      0x2000104d        0x1 obj/SKYROVER/drv_i2c.o
+ *fill*         0x2000104e        0x2 
  .bss.sysTickUptime
-                0x20001048        0x4 obj/SKYROVER/drv_system.o
-                0x20001048                sysTickUptime
- .bss.usTicks   0x2000104c        0x4 obj/SKYROVER/drv_system.o
+                0x20001050        0x4 obj/SKYROVER/drv_system.o
+                0x20001050                sysTickUptime
+ .bss.usTicks   0x20001054        0x4 obj/SKYROVER/drv_system.o
  .bss.tx2Buffer.9197
-                0x20001050       0x40 obj/SKYROVER/drv_uart.o
+                0x20001058       0x40 obj/SKYROVER/drv_uart.o
  .bss.tx1Buffer.9188
-                0x20001090      0x100 obj/SKYROVER/drv_uart.o
+                0x20001098      0x100 obj/SKYROVER/drv_uart.o
  .bss.rx2Buffer.9196
-                0x20001190       0x80 obj/SKYROVER/drv_uart.o
+                0x20001198       0x80 obj/SKYROVER/drv_uart.o
  .bss.rx1Buffer.9187
-                0x20001210      0x100 obj/SKYROVER/drv_uart.o
+                0x20001218      0x100 obj/SKYROVER/drv_uart.o
  .bss.uartPort1
-                0x20001310       0x50 obj/SKYROVER/drv_uart.o
+                0x20001318       0x50 obj/SKYROVER/drv_uart.o
  .bss.uartPort2
-                0x20001360       0x50 obj/SKYROVER/drv_uart.o
+                0x20001368       0x50 obj/SKYROVER/drv_uart.o
  .bss.U8G_SSD_A0_SET
-                0x200013b0        0x1 obj/SKYROVER/drv_u8g.o
-                0x200013b0                U8G_SSD_A0_SET
+                0x200013b8        0x1 obj/SKYROVER/drv_u8g.o
+                0x200013b8                U8G_SSD_A0_SET
  .bss.U8G_SSD_A0_STATE
-                0x200013b1        0x1 obj/SKYROVER/drv_u8g.o
-                0x200013b1                U8G_SSD_A0_STATE
- *fill*         0x200013b2        0x2 
+                0x200013b9        0x1 obj/SKYROVER/drv_u8g.o
+                0x200013b9                U8G_SSD_A0_STATE
+ *fill*         0x200013ba        0x2 
  .bss.stdout_putf
-                0x200013b4        0x4 obj/SKYROVER/printf.o
+                0x200013bc        0x4 obj/SKYROVER/printf.o
  .bss.stdout_putp
-                0x200013b8        0x4 obj/SKYROVER/printf.o
+                0x200013c0        0x4 obj/SKYROVER/printf.o
  .bss.boardRotation
-                0x200013bc       0x24 obj/SKYROVER/utils.o
+                0x200013c4       0x24 obj/SKYROVER/utils.o
  .bss.xSuspendedTaskList
-                0x200013e0       0x14 obj/SKYROVER/tasks.o
+                0x200013e8       0x14 obj/SKYROVER/tasks.o
  .bss.pxDelayedTaskList
-                0x200013f4        0x4 obj/SKYROVER/tasks.o
- .bss.xSchedulerRunning
-                0x200013f8        0x4 obj/SKYROVER/tasks.o
- .bss.uxTasksDeleted
                 0x200013fc        0x4 obj/SKYROVER/tasks.o
+ .bss.xSchedulerRunning
+                0x20001400        0x4 obj/SKYROVER/tasks.o
+ .bss.uxTasksDeleted
+                0x20001404        0x4 obj/SKYROVER/tasks.o
  .bss.xTasksWaitingTermination
-                0x20001400       0x14 obj/SKYROVER/tasks.o
+                0x20001408       0x14 obj/SKYROVER/tasks.o
  .bss.xDelayedTaskList2
-                0x20001414       0x14 obj/SKYROVER/tasks.o
+                0x2000141c       0x14 obj/SKYROVER/tasks.o
  .bss.uxPendedTicks
-                0x20001428        0x4 obj/SKYROVER/tasks.o
+                0x20001430        0x4 obj/SKYROVER/tasks.o
  .bss.pxReadyTasksLists
-                0x2000142c       0xa0 obj/SKYROVER/tasks.o
+                0x20001434       0xa0 obj/SKYROVER/tasks.o
  .bss.uxSchedulerSuspended
-                0x200014cc        0x4 obj/SKYROVER/tasks.o
- .bss.xNumOfOverflows
-                0x200014d0        0x4 obj/SKYROVER/tasks.o
- .bss.pxCurrentTCB
                 0x200014d4        0x4 obj/SKYROVER/tasks.o
-                0x200014d4                pxCurrentTCB
+ .bss.xNumOfOverflows
+                0x200014d8        0x4 obj/SKYROVER/tasks.o
+ .bss.pxCurrentTCB
+                0x200014dc        0x4 obj/SKYROVER/tasks.o
+                0x200014dc                pxCurrentTCB
  .bss.xPendingReadyList
-                0x200014d8       0x14 obj/SKYROVER/tasks.o
+                0x200014e0       0x14 obj/SKYROVER/tasks.o
  .bss.xTickCount
-                0x200014ec        0x4 obj/SKYROVER/tasks.o
- .bss.pxOverflowDelayedTaskList
-                0x200014f0        0x4 obj/SKYROVER/tasks.o
- .bss.uxTaskNumber
                 0x200014f4        0x4 obj/SKYROVER/tasks.o
+ .bss.pxOverflowDelayedTaskList
+                0x200014f8        0x4 obj/SKYROVER/tasks.o
+ .bss.uxTaskNumber
+                0x200014fc        0x4 obj/SKYROVER/tasks.o
  .bss.xDelayedTaskList1
-                0x200014f8       0x14 obj/SKYROVER/tasks.o
+                0x20001500       0x14 obj/SKYROVER/tasks.o
  .bss.uxCurrentNumberOfTasks
-                0x2000150c        0x4 obj/SKYROVER/tasks.o
- .bss.uxTopReadyPriority
-                0x20001510        0x4 obj/SKYROVER/tasks.o
- .bss.xYieldPending
                 0x20001514        0x4 obj/SKYROVER/tasks.o
+ .bss.uxTopReadyPriority
+                0x20001518        0x4 obj/SKYROVER/tasks.o
+ .bss.xYieldPending
+                0x2000151c        0x4 obj/SKYROVER/tasks.o
  .bss.pxCurrentTimerList
-                0x20001518        0x4 obj/SKYROVER/timers.o
+                0x20001520        0x4 obj/SKYROVER/timers.o
  .bss.xActiveTimerList1
-                0x2000151c       0x14 obj/SKYROVER/timers.o
+                0x20001524       0x14 obj/SKYROVER/timers.o
  .bss.xActiveTimerList2
-                0x20001530       0x14 obj/SKYROVER/timers.o
+                0x20001538       0x14 obj/SKYROVER/timers.o
  .bss.xLastTime.5129
-                0x20001544        0x4 obj/SKYROVER/timers.o
- .bss.xTimerQueue
-                0x20001548        0x4 obj/SKYROVER/timers.o
- .bss.pxOverflowTimerList
                 0x2000154c        0x4 obj/SKYROVER/timers.o
+ .bss.xTimerQueue
+                0x20001550        0x4 obj/SKYROVER/timers.o
+ .bss.pxOverflowTimerList
+                0x20001554        0x4 obj/SKYROVER/timers.o
  .bss.xHeapHasBeenInitialised.4922
-                0x20001550        0x4 obj/SKYROVER/heap_2.o
- .bss.xStart    0x20001554        0x8 obj/SKYROVER/heap_2.o
- .bss.ucHeap    0x2000155c     0x1000 obj/SKYROVER/heap_2.o
- .bss.xEnd      0x2000255c        0x8 obj/SKYROVER/heap_2.o
+                0x20001558        0x4 obj/SKYROVER/heap_2.o
+ .bss.xStart    0x2000155c        0x8 obj/SKYROVER/heap_2.o
+ .bss.ucHeap    0x20001564     0x1000 obj/SKYROVER/heap_2.o
+ .bss.xEnd      0x20002564        0x8 obj/SKYROVER/heap_2.o
  .bss.ucMaxSysCallPriority
-                0x20002564        0x1 obj/SKYROVER/port.o
- *fill*         0x20002565        0x3 
+                0x2000256c        0x1 obj/SKYROVER/port.o
+ *fill*         0x2000256d        0x3 
  .bss.ulMaxPRIGROUPValue
-                0x20002568        0x4 obj/SKYROVER/port.o
+                0x20002570        0x4 obj/SKYROVER/port.o
  .bss.Data_Mul_MaxPacketSize
-                0x2000256c        0x1 obj/SKYROVER/usb_core.o
-                0x2000256c                Data_Mul_MaxPacketSize
+                0x20002574        0x1 obj/SKYROVER/usb_core.o
+                0x20002574                Data_Mul_MaxPacketSize
  .bss.USB_Tx_State
-                0x2000256d        0x1 obj/SKYROVER/hw_config.o
-                0x2000256d                USB_Tx_State
- *fill*         0x2000256e        0x2 
+                0x20002575        0x1 obj/SKYROVER/hw_config.o
+                0x20002575                USB_Tx_State
+ *fill*         0x20002576        0x2 
  .bss.USART_Rx_ptr_in
-                0x20002570        0x4 obj/SKYROVER/hw_config.o
-                0x20002570                USART_Rx_ptr_in
- .bss.USART_Rx_ptr_out
-                0x20002574        0x4 obj/SKYROVER/hw_config.o
-                0x20002574                USART_Rx_ptr_out
- .bss.USART_Rx_length
                 0x20002578        0x4 obj/SKYROVER/hw_config.o
-                0x20002578                USART_Rx_length
+                0x20002578                USART_Rx_ptr_in
+ .bss.USART_Rx_ptr_out
+                0x2000257c        0x4 obj/SKYROVER/hw_config.o
+                0x2000257c                USART_Rx_ptr_out
+ .bss.USART_Rx_length
+                0x20002580        0x4 obj/SKYROVER/hw_config.o
+                0x20002580                USART_Rx_length
  .bss.FrameCount.9656
-                0x2000257c        0x4 obj/SKYROVER/usb_endp.o
+                0x20002584        0x4 obj/SKYROVER/usb_endp.o
  .bss.bIntPackSOF
-                0x20002580        0x1 obj/SKYROVER/usb_istr.o
-                0x20002580                bIntPackSOF
+                0x20002588        0x1 obj/SKYROVER/usb_istr.o
+                0x20002588                bIntPackSOF
  .bss.reset_state
-                0x20002581        0x1 obj/SKYROVER/usb_prop.o
-                0x20002581                reset_state
- .bss.Request   0x20002582        0x1 obj/SKYROVER/usb_prop.o
-                0x20002582                Request
- *fill*         0x20002583        0x1 
+                0x20002589        0x1 obj/SKYROVER/usb_prop.o
+                0x20002589                reset_state
+ .bss.Request   0x2000258a        0x1 obj/SKYROVER/usb_prop.o
+                0x2000258a                Request
+ *fill*         0x2000258b        0x1 
  .bss.bDeviceState
-                0x20002584        0x4 obj/SKYROVER/usb_pwr.o
-                0x20002584                bDeviceState
+                0x2000258c        0x4 obj/SKYROVER/usb_pwr.o
+                0x2000258c                bDeviceState
  .bss.u8g_dev_ssd1306_128x64_i2c_buf
-                0x20002588       0x80 obj/SKYROVER/u8g_dev_ssd1306_128x64.o
-                0x20002588                u8g_dev_ssd1306_128x64_i2c_buf
+                0x20002590       0x80 obj/SKYROVER/u8g_dev_ssd1306_128x64.o
+                0x20002590                u8g_dev_ssd1306_128x64_i2c_buf
  *(COMMON)
- COMMON         0x20002608      0x100 obj/SKYROVER/drv_timer.o
-                0x20002608                timerConfig
- COMMON         0x20002708      0x440 obj/SKYROVER/config.o
-                0x20002708                cfg
-                0x200027cc                mcfg
- COMMON         0x20002b48       0x1f obj/SKYROVER/gps.o
-                0x20002b48                ubs_protocol_bytes
-                0x20002b49                ubx_nav_status_bits
-                0x20002b4a                xLeadFilter
-                0x20002b4c                gpsData
-                0x20002b64                yLeadFilter
-                0x20002b66                ubs_nav_fix_type
- *fill*         0x20002b67        0x1 
- COMMON         0x20002b68       0x48 obj/SKYROVER/imu.o
-                0x20002b68                sonarAlt
-                0x20002b6c                gyroADC
-                0x20002b74                accSum
-                0x20002b80                accVelScale
-                0x20002b84                accADC
-                0x20002b8c                EstAlt
-                0x20002b90                magADC
-                0x20002b98                AltHold
-                0x20002b9c                accSmooth
-                0x20002ba4                EstG
- COMMON         0x20002bb0       0x24 obj/SKYROVER/main.o
-                0x20002bb0                core
- COMMON         0x20002bd4       0x30 obj/SKYROVER/mixer.o
-                0x20002bd4                motor
-                0x20002bec                motor_disarmed
- COMMON         0x20002c04      0x108 obj/SKYROVER/mw.o
-                0x20002c04                GPS_svinfo_chn
-                0x20002c14                telemTemperature1
-                0x20002c16                f
-                0x20002c28                GPS_altitude
-                0x20002c2a                nav_rated
-                0x20002c2e                lookupThrottleRC
-                0x20002c46                nav
-                0x20002c4a                GPS_speed
-                0x20002c4c                GPS_hold
-                0x20002c54                debug
-                0x20002c5c                rcCommand
-                0x20002c64                vbat
-                0x20002c66                batteryWarningVoltage
-                0x20002c68                axisPID
-                0x20002c6e                GPS_distanceToHome
-                0x20002c70                GPS_home
-                0x20002c78                GPS_directionToHome
-                0x20002c7a                rcOptions
-                0x20002c8f                GPS_svinfo_svid
-                0x20002ca0                GPS_coord
-                0x20002ca8                GPS_svinfo_quality
-                0x20002cb8                dynI8
-                0x20002cbc                rssi
-                0x20002cbe                GPS_numSat
-                0x20002cbf                GPS_numCh
-                0x20002cc0                headFreeModeHold
-                0x20002cc2                rcData
-                0x20002ce6                dynD8
-                0x20002ce9                dynP8
-                0x20002cec                GPS_svinfo_cno
-                0x20002cfc                AccInflightCalibrationArmed
-                0x20002cfe                lookupPitchRollRC
- COMMON         0x20002d0c       0x3e obj/SKYROVER/sensors.o
-                0x20002d0c                acc
-                0x20002d1c                magHold
-                0x20002d20                gyro
-                0x20002d30                baro
-                0x20002d48                heading
- COMMON         0x20002d4a       0x10 obj/SKYROVER/spektrum.o
-                0x20002d4a                spekFrame
- *fill*         0x20002d5a        0x2 
- COMMON         0x20002d5c      0x498 obj/SKYROVER/drv_softserial.o
-                0x20002d5c                softSerialPorts
- COMMON         0x200031f4        0x4 obj/SKYROVER/drv_vcom.o
-                0x200031f4                Hw_VCom_RxdFuncPtr
- COMMON         0x200031f8      0x408 obj/SKYROVER/drv_vcom_q.o
-                0x200031f8                Hw_VCom_Q_Buffer
-                0x200035fa                Hw_VCom_Q_End
-                0x200035fc                Hw_VCom_Q_Start
-                0x200035fe                Hw_VCom_Q_Size
- COMMON         0x20003600        0x1 obj/SKYROVER/system_stm32f10x.o
-                0x20003600                HSEStartUpStatus
- *fill*         0x20003601        0x1 
- COMMON         0x20003602        0x2 obj/SKYROVER/usb_core.o
-                0x20003602                StatusInfo
- COMMON         0x20003604       0x32 obj/SKYROVER/usb_init.o
-                0x20003604                SaveState
-                0x20003608                pProperty
-                0x2000360c                EPindex
-                0x20003610                Device_Info
-                0x2000362c                pUser_Standard_Requests
-                0x20003630                pInformation
-                0x20003634                wInterrupt_Mask
- COMMON         0x20003636        0x4 obj/SKYROVER/usb_int.o
-                0x20003636                SaveRState
-                0x20003638                SaveTState
- *fill*         0x2000363a        0x2 
- COMMON         0x2000363c      0x818 obj/SKYROVER/hw_config.o
-                0x2000363c                USART_Rx_Buffer
-                0x20003e3c                USART_InitStructure
-                0x20003e4c                EXTI_InitStructure
- COMMON         0x20003e54       0x40 obj/SKYROVER/usb_endp.o
-                0x20003e54                USB_Rx_Buffer
- COMMON         0x20003e94        0x2 obj/SKYROVER/usb_istr.o
-                0x20003e94                wIstr
- *fill*         0x20003e96        0x2 
- COMMON         0x20003e98       0x41 obj/SKYROVER/thread_lcd.o
-                0x20003e98                lcd_state
-                0x20003e9c                u8g
-                0x20003ed8                thread_lcd_draw_lcd_flag
- *fill*         0x20003ed9        0x3 
- COMMON         0x20003edc       0x10 obj/SKYROVER/thread_main.o
-                0x20003edc                Thread_Handle_lcd
-                0x20003ee0                Thread_Handle_menu
-                0x20003ee4                Thread_Handle_mw
-                0x20003ee8                Mutex_Loop
-                0x20003eec                . = ALIGN (0x4)
-                0x20003eec                _ebss = .
-                0x20003eec                __bss_end__ = _ebss
+ COMMON         0x20002610      0x100 obj/SKYROVER/drv_timer.o
+                0x20002610                timerConfig
+ COMMON         0x20002710      0x440 obj/SKYROVER/config.o
+                0x20002710                cfg
+                0x200027d4                mcfg
+ COMMON         0x20002b50       0x1f obj/SKYROVER/gps.o
+                0x20002b50                ubs_protocol_bytes
+                0x20002b51                ubx_nav_status_bits
+                0x20002b52                xLeadFilter
+                0x20002b54                gpsData
+                0x20002b6c                yLeadFilter
+                0x20002b6e                ubs_nav_fix_type
+ *fill*         0x20002b6f        0x1 
+ COMMON         0x20002b70       0x48 obj/SKYROVER/imu.o
+                0x20002b70                sonarAlt
+                0x20002b74                gyroADC
+                0x20002b7c                accSum
+                0x20002b88                accVelScale
+                0x20002b8c                accADC
+                0x20002b94                EstAlt
+                0x20002b98                magADC
+                0x20002ba0                AltHold
+                0x20002ba4                accSmooth
+                0x20002bac                EstG
+ COMMON         0x20002bb8       0x24 obj/SKYROVER/main.o
+                0x20002bb8                core
+ COMMON         0x20002bdc       0x30 obj/SKYROVER/mixer.o
+                0x20002bdc                motor
+                0x20002bf4                motor_disarmed
+ COMMON         0x20002c0c      0x10e obj/SKYROVER/mw.o
+                0x20002c0c                GPS_svinfo_chn
+                0x20002c1c                telemTemperature1
+                0x20002c1e                f
+                0x20002c30                GPS_altitude
+                0x20002c32                nav_rated
+                0x20002c36                lookupThrottleRC
+                0x20002c4e                nav
+                0x20002c52                GPS_speed
+                0x20002c54                GPS_hold
+                0x20002c5c                debug
+                0x20002c64                rcCommand
+                0x20002c6c                vbat
+                0x20002c6e                batteryWarningVoltage
+                0x20002c70                axisPID
+                0x20002c76                GPS_distanceToHome
+                0x20002c78                GPS_home
+                0x20002c80                GPS_directionToHome
+                0x20002c82                rcOptions
+                0x20002c97                GPS_svinfo_svid
+                0x20002ca8                GPS_coord
+                0x20002cb0                GPS_svinfo_quality
+                0x20002cc0                logReg
+                0x20002cc6                dynI8
+                0x20002cca                rssi
+                0x20002ccc                GPS_numSat
+                0x20002ccd                GPS_numCh
+                0x20002cce                headFreeModeHold
+                0x20002cd0                rcData
+                0x20002cf4                dynD8
+                0x20002cf7                dynP8
+                0x20002cfa                GPS_svinfo_cno
+                0x20002d0a                AccInflightCalibrationArmed
+                0x20002d0c                lookupPitchRollRC
+ *fill*         0x20002d1a        0x2 
+ COMMON         0x20002d1c       0x3e obj/SKYROVER/sensors.o
+                0x20002d1c                acc
+                0x20002d2c                magHold
+                0x20002d30                gyro
+                0x20002d40                baro
+                0x20002d58                heading
+ COMMON         0x20002d5a       0x10 obj/SKYROVER/spektrum.o
+                0x20002d5a                spekFrame
+ *fill*         0x20002d6a        0x2 
+ COMMON         0x20002d6c      0x498 obj/SKYROVER/drv_softserial.o
+                0x20002d6c                softSerialPorts
+ COMMON         0x20003204        0x4 obj/SKYROVER/drv_vcom.o
+                0x20003204                Hw_VCom_RxdFuncPtr
+ COMMON         0x20003208      0x408 obj/SKYROVER/drv_vcom_q.o
+                0x20003208                Hw_VCom_Q_Buffer
+                0x2000360a                Hw_VCom_Q_End
+                0x2000360c                Hw_VCom_Q_Start
+                0x2000360e                Hw_VCom_Q_Size
+ COMMON         0x20003610        0x1 obj/SKYROVER/system_stm32f10x.o
+                0x20003610                HSEStartUpStatus
+ *fill*         0x20003611        0x1 
+ COMMON         0x20003612        0x2 obj/SKYROVER/usb_core.o
+                0x20003612                StatusInfo
+ COMMON         0x20003614       0x32 obj/SKYROVER/usb_init.o
+                0x20003614                SaveState
+                0x20003618                pProperty
+                0x2000361c                EPindex
+                0x20003620                Device_Info
+                0x2000363c                pUser_Standard_Requests
+                0x20003640                pInformation
+                0x20003644                wInterrupt_Mask
+ COMMON         0x20003646        0x4 obj/SKYROVER/usb_int.o
+                0x20003646                SaveRState
+                0x20003648                SaveTState
+ *fill*         0x2000364a        0x2 
+ COMMON         0x2000364c      0x818 obj/SKYROVER/hw_config.o
+                0x2000364c                USART_Rx_Buffer
+                0x20003e4c                USART_InitStructure
+                0x20003e5c                EXTI_InitStructure
+ COMMON         0x20003e64       0x40 obj/SKYROVER/usb_endp.o
+                0x20003e64                USB_Rx_Buffer
+ COMMON         0x20003ea4        0x2 obj/SKYROVER/usb_istr.o
+                0x20003ea4                wIstr
+ *fill*         0x20003ea6        0x2 
+ COMMON         0x20003ea8       0x41 obj/SKYROVER/thread_lcd.o
+                0x20003ea8                lcd_state
+                0x20003eac                u8g
+                0x20003ee8                thread_lcd_draw_lcd_flag
+ *fill*         0x20003ee9        0x3 
+ COMMON         0x20003eec       0x10 obj/SKYROVER/thread_main.o
+                0x20003eec                Thread_Handle_lcd
+                0x20003ef0                Thread_Handle_menu
+                0x20003ef4                Thread_Handle_mw
+                0x20003ef8                Mutex_Loop
+                0x20003efc                . = ALIGN (0x4)
+                0x20003efc                _ebss = .
+                0x20003efc                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x20003eec      0x400 load address 0x0801b8c4
-                0x20003eec                . = ALIGN (0x4)
-                0x20003eec                PROVIDE (end, .)
-                0x20003eec                PROVIDE (_end, .)
-                0x20003eec                . = (. + _Min_Heap_Size)
-                0x200042ec                . = (. + _Min_Stack_Size)
- *fill*         0x20003eec      0x400 
-                0x200042ec                . = ALIGN (0x4)
+                0x20003efc      0x400 load address 0x0801b8c4
+                0x20003efc                . = ALIGN (0x4)
+                0x20003efc                PROVIDE (end, .)
+                0x20003efc                PROVIDE (_end, .)
+                0x20003efc                . = (. + _Min_Heap_Size)
+                0x200042fc                . = (. + _Min_Stack_Size)
+ *fill*         0x20003efc      0x400 
+                0x200042fc                . = ALIGN (0x4)
 
 .memory_b1_text
  *(.mb1text)
