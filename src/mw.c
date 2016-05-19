@@ -907,7 +907,7 @@ void dataSend(logStruct* LOG)
 	}
 }
 
-void logging(step)
+void logging(uint8_t step)
 {
 	static logStruct LOG;
 
